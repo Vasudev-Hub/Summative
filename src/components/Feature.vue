@@ -24,7 +24,7 @@ onMounted(async () => {
             throw new Error("API Key is missing or undefined.");
         }
 
-        const url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}`;
+        const url = `https://api.themoviedb.org/3/movie/now_playing?api_key=${import.meta.env.VITE_API_KEY}`;
         const res = await axios.get(url);
         response.value = res.data.results; // Store only results array
     } catch (error) {

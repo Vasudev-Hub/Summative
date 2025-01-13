@@ -1,30 +1,38 @@
 <script setup>
 import { ref } from 'vue';
-import { useStore } from '../store';
+import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "../firebase";
 import { useRouter } from 'vue-router';
-
-const store = useStore();
-const router = useRouter();
+import { useStore } from "../store"
 
 const firstName = ref('');
 const lastName = ref('');
 const email = ref('');
 const password = ref('');
-const reEnterPassword = ref('');
+const confirmPassword = ref('');
+const router = useRouter();
+const store = useStore();
 
-const handleRegister = () => {
-    if (password.value === reEnterPassword.value) {
-        store.firstName = firstName.value;
-        store.lastName = lastName.value;
-        store.email = email.value;
-        store.password = password.value;
-        router.push('/movies');
-    } else {
-        alert('Passwords do not match!');
-    
-    }
-};
+async function registerByEmail() {
+  try {
+    const user = (await createUserWithEmailAndPassword(auth, email.value, password.value)).user;
+    await updateProfile(user, { displayName: `${firstName.value} ${lastName.value}` });
+    store.user = user;
+    router.push("/movies/all");
+  } catch (error) {
+    alert("There was an error creating a user with email!");
+  }
+}
 
+async function registerByGoogle() {
+  try {
+    const user = (await signInWithPopup(auth, new GoogleAuthProvider())).user;
+    store.user = user;
+    router.push("/movies/all");
+  } catch (error) {
+    alert("There was an error creating a user with Google!");
+  }
+}
 </script>
 
 <template>
@@ -34,7 +42,7 @@ const handleRegister = () => {
 
     <div class="form-container">
         <h2>Register Account</h2>
-        <form @submit.prevent="handleRegister">
+        <form @submit.prevent="registerByEmail">
             <input v-model="firstName" type="text" placeholder="First Name" class="input-field" required />
             <input v-model="lastName" type="text" placeholder="Last Name" class="input-field" required />
             <input v-model="email" type="email" placeholder="Email" class="input-field" required />
@@ -43,6 +51,10 @@ const handleRegister = () => {
                 required />
             <button type="submit" class="button login">Register</button>
         </form>
+    </div>
+    
+    <div>
+        <button @click="registerByGoogle()" class="button register">Register by Google</button>
     </div>
 </template>
 

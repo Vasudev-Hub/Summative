@@ -64,6 +64,6 @@ h1 {
 .welcome-message {
   margin-right: 20px;
   font-size: 18px;
-  color: #f2e1f3; /* Lighter purple text for the welcome message */
+  color: #f200ff; /* Lighter purple text for the welcome message */
 }
 </style>
